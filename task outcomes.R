@@ -1,7 +1,7 @@
 #### set up ####
 
 setwd("~/Dropbox/UO/Dissertation/data/Processed files/Study 1")
-library(psych); library(dplyr); library(ggplot2); library
+library(psych); library(dplyr); library(ggplot2)
 
 # this file has post-task ratings, IDs, RR ratings, and scored task results
 # it's long by participant and group (each row is one p in one group)
@@ -9,6 +9,7 @@ library(psych); library(dplyr); library(ggplot2); library
 # this is the same, but includes the group responses (not just individuals)
 s1grp<-read.csv("Study 1_alldata_w scored outcomes.csv")
 head(s1grp)
+names(s1grp)
 # recode task
 s1grp$task_n<-ifelse(s1grp$task==1,"PS",
                      ifelse(s1grp$task==2,"LGD",
@@ -27,7 +28,17 @@ s1grp<-s1grp[,-c(1)]
 
 # correlation w/ liking,status,respect
 names(s1grp)
+library(tidyverse)
 outcomes<-cor(s1grp[c(107,113,121,207,212,218,248,291:293,250:263,267:283)], 
     use="pairwise.complete.obs")[,1:6]
 
+s1grpf <- s1grp %>% filter(drop == 0)
+cor(s1grpf[c(107,113,121,207,212,218,248,291:293,250:263,267:283)], 
+    use="pairwise.complete.obs")[,1:6]
+
+write.csv(s1grpf,)
+
 write.csv(outcomes,"status liking respect w outcomes.csv")
+
+
+

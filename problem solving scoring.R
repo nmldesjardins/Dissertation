@@ -11,7 +11,7 @@ s1grp2<-read.csv("Study 1_post task by task_RR__group results 5.16.16.csv")
 
 head(s1grp2)
 
-describeBy(s1grp[c(271,272,176,177,322)], s1grp$task)
+#describeBy(s1grp[c(271,272,176,177,322)], s1grp$task)
 
 # trim down the orig dataset for merging later
 # will ultimately create a dataset that just has task scores without 
@@ -19,7 +19,7 @@ describeBy(s1grp[c(271,272,176,177,322)], s1grp$task)
 names(s1grp2)
 
 s1grp<-s1grp2[,c(1:16,32:35,66:281,312:322,338)]
-
+head(s1grp)
 
 
 #### PS ####
@@ -219,11 +219,13 @@ ps$PS.perinfwrong_tot<-100*(ps$infwrong/ps$PS.totans.g)
 ps_score<-ps[,c(1:7,126:131,160:161,190:195)]
 write.csv(ps_score,"problem solving_scored variables.csv")
 
+ps_score <- ps_score %>% filter(task == 1)
+head(ps_score)
+
 # merge back into aggregated data
-names(s1grp)
+df <- read.csv('Study 1_post task by task_RR_IDs_4.7.16.csv')
 
-s1grp<-merge(s1grp,ps_score,by=1:6)
-
+df2<- left_join(df,ps_score, by = c('groupID','PerceiverID','task','Group','table','session','PS.Table'))
 
 #### LOM ####
 lom<-s1grp2[,c(1:6,15:31,69,323:337)]
@@ -294,22 +296,26 @@ head(lom_long)
 # correlations
 
 # this wasn't getting separate estimates for each perciever?
-#persgroup<-lom_long %>%
+# persgroup<-lom_long %>%
 #        group_by(PerceiverID) %>%
-#        do({
-#                gi<-cor(lom_long$i,lom_long$g, use="pairwise.complete.obs")
-#                data.frame(gi)
-#        })
+#         do({
+#                 gi<-cor(lom_long$i,lom_long$g, use="pairwise.complete.obs")
+#                 data.frame(gi)
+#         })
 
+library(magrittr)
 
+lom_long %>% select(g, i, PerceiverID) %>% group_by(PerceiverID) %$% cor(g,i)
 # corr bet person's answers and groups answers
 func<-function(lom_long)
 {
         return(data.frame(LOM.pergrp_correl = cor(lom_long$i,lom_long$g,use="pairwise.complete.obs")))
 }
 
-#this tells it to analyze by subject id
-persongroup<-ddply(lom_long,.(PerceiverID),func)
+#this tells it to analyze by perceiver id
+#persongroup<-plyr::ddply(lom_long,.(PerceiverID),func)
+
+persongroup<-plyr::ddply(lom_long,~PerceiverID,func)
 
 # corr person's answers and correct answers
 func<-function(lom_long)
@@ -317,7 +323,7 @@ func<-function(lom_long)
         return(data.frame(LOM.perscorrect_correl = cor(lom_long$i,lom_long$r,use="pairwise.complete.obs")))
 }
 
-personright<-ddply(lom_long,.(PerceiverID),func)
+personright<-plyr::ddply(lom_long,~PerceiverID,func)
 
 # corr groups answers and right answers
 func<-function(lom_long)
@@ -325,13 +331,13 @@ func<-function(lom_long)
         return(data.frame(LOM.grpcorrect_correl = cor(lom_long$g,lom_long$r,use="pairwise.complete.obs")))
 }
 
-groupright<-ddply(lom_long,.(groupID),func)
+groupright<-plyr::ddply(lom_long,~groupID,func)
 
 
 # merge
-lom2<-merge(lom2,persongroup)
-lom2<-merge(lom2,personright)
-lom2<-merge(lom2,groupright)
+lom2<-merge(lom2,persongroup, by = c('PerceiverID'))
+lom2<-merge(lom2,personright, by = c('PerceiverID'))
+lom2<-merge(lom2,groupright, by = 'groupID')
 
 
 
@@ -443,14 +449,21 @@ lom$LOM.influence_w_p_tot<-100*(lom$LOM.influence_wrong/lom$LOM.totans.g)
 lomscores<-lom[,c(1:8,24,85:90,106:107,123:128)]
 write.csv(lomscores,"lom scores.csv")
 
+
 ## merge
-s1grp<-merge(s1grp,lomscores, by=1:6)
+#s1grp<-merge(s1grp,lomscores, by=1:6)
+lomscores <- lomscores %>% filter(task == 3)
+head(lomscores)
+
+# merge back into aggregated data
+
+df2<- left_join(df2,lomscores, by = c('groupID','PerceiverID','task','Group','table','session'))
+
 
 ## merge w/ rank order consistency
 lom3<-lom2[,c(1:3,49:51)]
 
-s1grp<-merge(s1grp,lom3,by=c("groupID","PerceiverID","task"), all=T)
-
+df2<- left_join(df2,lom3, by = c('groupID','PerceiverID','task'))
 
 
 #### lgd ####
@@ -537,6 +550,27 @@ s1grp$lgd.prizemoney<-ifelse(s1grp$LGD.nominee==s1grp$LGD.winner,s1grp$LGD.prize
 
 summary(s1grp$lgd.prizemoney)
 
-write.csv(s1grp,"Study 1_alldata_w scored outcomes.csv")
+
+lgdscores <- s1grp %>% filter(task == 2)
+names(lgdscores)
+
+lgdscores<- lgdscores %>% select(groupID, PerceiverID, task, Group, table, "LGD.prize1",          "LGD.prize2",          "LGD.prize3",          "LGD.prize4",         
+                      "LGD.prize5",          "LGD.winner",          "LGD.2ndplace",        "LGD.3rdplace" ,       "LGD.4thplace",       
+                     "LGD.5thplace",        "LGD.lastplace",       "lgd.win",             "LGD.winner_name",     "LGD.2ndplace_name" , 
+                     "LGD.3rdplace_name",   "LGD.4thplace_name",   "LGD.5thplace_name",   "LGD.lastplace_name" , "LGD.nominee_name",   
+                     "lgd.lose",            "lgd.place",           "LGD.prize1n",         "LGD.prize2n",         "LGD.prize3n" ,       
+                     "LGD.prize4n",         "LGD.prize5n",         "lgd.prizemoney"  )
+
+
+
+df2 <- left_join(df2, lgdscores, by=c('groupID', 'PerceiverID','task','Group','table'))
+head(df2)
+
+df2$task_name<-ifelse(df2$task==1,"PS",
+                     ifelse(df2$task==2,"LGD",
+                            ifelse(df2$task==3,"LOM",
+                                   ifelse(df2$task==4,"social",NA))))
+
+write.csv(df2,"Study 1_alldata_w scored outcomes_91617.csv")
 
 

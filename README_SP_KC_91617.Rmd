@@ -1,0 +1,64 @@
+---
+title: "README_SPKC"
+output: pdf_document
+---
+
+---
+title: "README_ENC"
+author: "NML DesJardins"
+date: "3/7/2017"
+output: pdf_document
+---
+
+## Dissertation Data: Stuff to Know  
+
+### Study1_SPIT_only.sav  
+This has all the answers to the SPIT questionnaire. I don't have access to SPSS at the moment, so it hasn't been opened in at least a year. I don't think I did anything to it except verify that the data entry was accurate (whatever I last sent to Smrithi is the last time I touched it -- I'd refer back to that). It should join up to the .csv file by PercieverId.
+
+### Study 1_alldata_w scored outcomes_91617.csv
+This has a whole lot of everything. It's long by perciever and group. It has the questions everyone was asked after each task, the group-mean-centered RR effects, the un-centered RR effects (`.gm`), individual difference scale scores, and demographic data. It also has individual responses to the lost on the moon (`LOM.`) and problem solving (`PS.`) questions, as well as scored group outcomes. See _Study 1 Group Task Scoring Outcomes Codebook_ for details about each scored outcome. Variables that start with `task_` are the participants' reports about the task itself (see the post-task questionnaire).
+  
+Rows where `drop` == 1 should be dropped from analyses to maintain independence across groups.
+These are groups that were weird -- they either had < 4 people, or contained members who had already worked with each other.  
+  
+## Group Variables 
+-`PerceiverID` & `target.id` are what they sound like (perceiver is making the rating about the target)
+-`Session` indicates which data collection session the participant was in; they're ordered chronologically.  
+-`Group`: chronological group (1 = first group; 2 = second group; etc)  
+-`GroupID`: unique group identifier  
+-`table`: just the table they were sitting at; should always be the same for everyone in a group  
+-`task`: which task the group completed (1 = problem solving; 2 = LGD; 3 = lost on the moon; 4 = unstructured/social)  
+
+  
+## Individual Difference Scales   
+Individual differences were reported prior to the group interactions. They include:  
+*bfie, bfia, bfic, bfin, bfio*: scores for the BFI  
+*E_Enthus, E_Assert....*: These are scales for the BFAS, which has 2 facets for each for the Big Five traits  
+*ntb*: need to belong  
+*npi_sum*: summed score of the NPI (this is the only sum - all other scales are either single-item or mean scores)  
+*npi_mean*: mean score of NPI  
+*sensepower, usepower*: Anderson, Keltner & John sense of and capacity to use power  
+*prestige, dominance*: Cheng & Tracy scales  
+*ctrl1, ctrl2*: these were control questions to make sure people were paying attention  
+  
+## Round-Robin Group Perceptions  
+*Suffixes*:  
+.p : perceiver effect    
+.t: target effect  
+.s: self-report  
+.gm: contains the group mean (not group-mean centered)  
+.mp: meta-perception (so .mp.t is how i think you think about me)  
+.enhance: self-enhancement index  
+  
+ext - agr - con - neu - ope are based on scale scores of the BFI-10 items. All other RR variables are single-items.  
+  
+  
+*Be sure to drop anyone where `drop` == 1 before doing any analyses where groups need to be independent of each other.*
+  
+  
+### problem solving scoring.R  
+This has how I scored all of the group tasks (despite the name, it has problem solving, LOM, and LGD scoring), in case you want more details about how that happened.  
+  
+### Other info  
+My github repo (github.com/nmldesjardins/Dissertation) has the code for the analyses I ran for my dissertation. `Study 1 analyses.R` and `Study 1 analyses part 2.R` are what I used for the paper. 
+
