@@ -1,0 +1,53 @@
+---
+title: "README_ENC"
+author: "NML DesJardins"
+date: "3/7/2017"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+setwd("~/Dropbox/UO/Dissertation/data/Processed files/Study 1")
+s1rr<-read.csv("Study 1_RR for analysis.csv")
+library(ggplot2); library(pander);library(psych); library(dplyr); library(reshape2)
+
+```
+
+## Dissertation Data: Stuff to Know  
+
+_Created for ENC, March 2017, for additional analyses of the RR variables (especially perceiver effects)._
+
+### Study 1_RR for analysis.csv:
+`Study 1_RR for analysis.csv`: This is the raw perception data. It has not yet been run through TripleR, and includes people/groups who should be dropped.
+
+Variables that end with .mp are meta-perceptions; all other variables are perceptions.  
+  
+Rows where `drop` == 1 should be dropped from analyses to maintain independence across groups.
+These are groups that were weird -- they either had < 4 people, or contained members who had already worked with each other.
+
+Ignore the `filter` variable. It's basically the inverse of `drop`, so I was doing analyses just on the groups where people worked together in more than one group. Like `drop`, though, `filter` also excludes everyone from Session 12, where they all worked in 3-person groups (that's why the two variables don't exactly line up).  
+
+#### Group Variables 
+-`PerceiverID` & `target.id` are what they sound like.  
+-`Session` indicates which data collection session the participant was in; they're ordered chronologically.  
+-`Group`: chronological group (1 = first group; 2 = second group; etc)  
+-`GroupID`: unique group identifier  
+-`table`: just the table they were sitting at; should always be the same for everyone in a group  
+-`task`: which task the group completed (1 = problem solving; 2 = LGD; 3 = lost on the moon; 4 = unstructured/social)  
+
+  
+### Study 1_post task by task_RR_IDs_4.7.16.csv
+This has a whole lot of everything. It's long by perciever and group. It has the questions everyone was asked after each task, the group-mean-centered RR effects, the un-centered RR effects (`.gm`), individual difference scale scores, and demographic data. It also has individual responses to the lost on the moon (`LOM.`) and problem solving (`PS.`) questions, which you can probably ignore.  
+  
+Be sure to drop anyone where `drop` == 1 before doing the analyses.
+  
+  
+### Study 1 abridged preprocessing.R  
+This is just pasted from Study 1 analyses.R, but only includes the steps to get from the raw RR data to the RR effects.  
+  
+  
+### Study 1 analyses.R
+This is literally all of my code (well, part 1 of it) for my dissertation.  
+It runs through a bit of pre-processing and then running the SRM model on status/liking/respect/influence for the whole sample as well as each task separately.   
+It also looks at some group-outcome data and sets up contrast codes for the tasks. I don't know that it'll be especially helpful, but it might be worth taking a look at.
+
